@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.dao;
 
+import com.mysql.cj.x.protobuf.MysqlxCrud;
 import com.parkit.parkingsystem.config.DataBaseConfig;
 import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.constants.ParkingType;
