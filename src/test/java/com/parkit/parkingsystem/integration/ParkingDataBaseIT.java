@@ -61,11 +61,18 @@ public class ParkingDataBaseIT {
     }
 
     @Test
-    public void testParkingLotExit(){
+    public void testParkingLotExit() throws InterruptedException {
+        //GIVEN
         testParkingACar();
+        Thread.sleep(1000);
+        //WHEN
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processExitingVehicle();
-        //Ticket ticket = ticketDAO;
+        Ticket ticket = ticketDAO.getTicket("ABCDEF");
+        //THEN
+        Assertions.assertThat(ticket).isNotNull();
+        Assertions.assertThat(ticket.getOutTime()).isNotNull();
+        Assertions.assertThat(ticket.getPrice()).isNotNull();
         //TODO: check that the fare generated and out time are populated correctly in the database
     }
 
