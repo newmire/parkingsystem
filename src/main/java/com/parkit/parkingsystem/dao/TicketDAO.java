@@ -1,6 +1,6 @@
 package com.parkit.parkingsystem.dao;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud;
+
 import com.parkit.parkingsystem.config.DataBaseConfig;
 import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.constants.ParkingType;
@@ -23,7 +23,7 @@ public class TicketDAO {
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
     public boolean saveTicket(Ticket ticket) {
-        Connection con = null;
+        Connection con;
         try {
             con = dataBaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(DBConstants.SAVE_TICKET);
@@ -34,12 +34,13 @@ public class TicketDAO {
             ps.setDouble(3, ticket.getPrice());
             ps.setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
             ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (new Timestamp(ticket.getOutTime().getTime())));
-            return ps.execute();
+            dataBaseConfig.closeConnection(con);
+            ps.close();
+            return true;
         } catch (Exception ex) {
             logger.error("Error fetching next available slot", ex);
-            dataBaseConfig.closeConnection(con);
-            return false;
         }
+        return false;
     }
 
     public Ticket getTicket(String vehicleRegNumber) {
@@ -66,7 +67,9 @@ public class TicketDAO {
             dataBaseConfig.closePreparedStatement(ps);
         } catch (Exception ex) {
             logger.error("Error fetching next available slot", ex);
+        } finally {
             dataBaseConfig.closeConnection(con);
+
         }
         return ticket;
     }
@@ -80,6 +83,7 @@ public class TicketDAO {
             ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));
             ps.setInt(3, ticket.getId());
             ps.execute();
+            ps.close();
             return true;
         } catch (Exception ex) {
             logger.error("Error saving ticket info", ex);
